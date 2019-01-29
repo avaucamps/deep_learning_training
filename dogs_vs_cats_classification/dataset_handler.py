@@ -16,6 +16,8 @@ REDUCED_TRAINING_DATASET_SIZE = 2560
 REDUCED_VALIDATION_DATASET_SIZE = 768
 FILENAME_COLUMN = 'filename'
 CLASS_COLUMN = 'class'
+TEST_PATH = Path(BASE_PATH + '/test/test')
+TEST_CSV = Path(BASE_PATH + '/test/test.csv')
 
 
 def prepare_dataset():
@@ -26,7 +28,8 @@ def prepare_dataset():
     if os.path.isfile(str(TRAIN_CSV)) and \
        os.path.isfile(str(VALID_CSV)) and \
        os.path.isfile(str(REDUCED_TRAIN_CSV)) and \
-       os.path.isfile(str(REDUCED_VALIDATION_CSV)):
+       os.path.isfile(str(REDUCED_VALIDATION_CSV)) and \
+       os.path.isfile(str(TEST_CSV)):
         return
 
     training_dict, validation_dict = get_training_and_validation_dictionaries(IMAGES_PATH)
@@ -48,16 +51,27 @@ def prepare_dataset():
 
     create_csv(VALID_CSV, validation_keys, validation_values)
     create_csv(REDUCED_VALIDATION_CSV, reduced_validation_keys, reduced_validation_values)
+    
+    test_filenames = get_test_filenames(TEST_PATH)
+    create_csv(TEST_CSV, test_filenames)
 
 
-def create_csv(path, keys, values):
-    df = pd.DataFrame(
-        {
-            FILENAME_COLUMN: keys,
-            CLASS_COLUMN: values
-        },
-        columns = [FILENAME_COLUMN, CLASS_COLUMN]
-    )
+def create_csv(path, keys, values=None):
+    if values:
+        df = pd.DataFrame(
+            {
+                FILENAME_COLUMN: keys,
+                CLASS_COLUMN: values
+            },
+            columns = [FILENAME_COLUMN, CLASS_COLUMN]
+        )
+    else:
+        df = pd.DataFrame(
+            {
+                FILENAME_COLUMN: keys
+            },
+            columns=[FILENAME_COLUMN]
+        )
 
     df.to_csv(str(path), index=False)
 
@@ -68,7 +82,7 @@ def get_training_and_validation_dictionaries(dataset_path):
     index = 0
     training_dict = collections.OrderedDict()
     validation_dict = collections.OrderedDict()
-    for i in IMAGES_PATH.iterdir():
+    for i in dataset_path.iterdir():
         filename = str(i).split('\\')[-1]
 
         if index in cross_validation_indexes:
@@ -79,6 +93,20 @@ def get_training_and_validation_dictionaries(dataset_path):
         index += 1
 
     return training_dict, validation_dict
+
+
+def get_test_filenames(test_dataset_path):
+    filenames = []
+    for i in test_dataset_path.iterdir():
+        split_filepath = str(i).split('\\')
+        filename = split_filepath[-1]
+        filenames.append(filename.split('.')[0])
+
+    filenames.sort(key=int)
+    for i in range(len(filenames)):
+        filenames[i] = filenames[i] + '.jpg'
+
+    return filenames
 
 
 def get_dataset_size(dataset_path):

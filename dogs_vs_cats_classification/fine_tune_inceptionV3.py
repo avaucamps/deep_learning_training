@@ -119,12 +119,12 @@ def get_training_generator(train_csv, images_path, filename_column, class_column
 
     return ImageDataGenerator(
         rescale=1./255,
-        rotation_range=25,
-        width_shift_range=0.35,
-        height_shift_range=0.35,
+        rotation_range=20,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
         horizontal_flip=True,
-        zoom_range=0.35,
-        shear_range=0.25,
+        zoom_range=0.2,
+        shear_range=0.2,
         fill_mode='nearest',
         vertical_flip=True
     ).flow_from_dataframe(
@@ -168,11 +168,11 @@ def get_inceptionV3_model():
     output = Dropout(0.5)(output)
     predictions = Dense(1, activation='sigmoid')(output)
 
+    for layer in base_model.layers: layer.trainable = False
+
     model = Model(
         inputs=base_model.input,
         outputs=predictions
     )
-
-    for layer in model.layers: layer.trainable = False
 
     return model
