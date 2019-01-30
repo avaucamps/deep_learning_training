@@ -1,7 +1,7 @@
 from dataset_handler import (prepare_dataset, BASE_PATH, IMAGES_PATH, TRAIN_CSV, VALID_CSV, 
 REDUCED_TRAIN_CSV, REDUCED_VALIDATION_CSV, FILENAME_COLUMN, CLASS_COLUMN)
-from fine_tune_inceptionV3 import fine_tune_model, fine_tune_existing_model, MODEL_PATH as fine_tuned_inceptionV3_model_path
-from bottleneck_features import train_bottleneck_model, MODEL_PATH as bottleneck_model_path
+from inceptionV3_fine_tuned_model import fine_tune_model, fine_tune_existing_model, MODEL_PATH as fine_tuned_inceptionV3_model_path
+from bottleneck_features_model import train_bottleneck_model, MODEL_PATH as bottleneck_model_path
 import os
 
 prepare_dataset()
